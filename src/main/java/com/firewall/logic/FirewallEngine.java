@@ -43,33 +43,67 @@ public class FirewallEngine {
     }
 
     /**
-     * Evaluates a packet against all active rules.
+     * Evaluates a packet against all active rules using Java Streams.
+     * Demonstrates: Stream API, Lambda Expressions, Method References, anyMatch()
      *
      * @param packet the packet to evaluate
      * @return true if the packet should be BLOCKED, false if allowed
      */
     public boolean shouldBlock(Packet packet) {
-        for (FilterRule rule : rules) {
-            if (rule.matches(packet)) {
-                return true; // First matching rule blocks the packet
-            }
-        }
-        return false; // No rules matched, allow the packet
+        // Using Stream API with Lambda for functional-style filtering
+        return rules.stream()
+                .filter(rule -> rule instanceof AbstractRule ar && ar.isEnabled())
+                .anyMatch(rule -> rule.matches(packet));
+    }
+
+    /**
+     * Gets the first rule that matches the given packet using Optional.
+     * Demonstrates: Stream API, filter(), findFirst(), Optional
+     *
+     * @param packet the packet to check
+     * @return Optional containing the matching rule, or empty if none matches
+     */
+    public java.util.Optional<FilterRule> findMatchingRule(Packet packet) {
+        return rules.stream()
+                .filter(rule -> rule instanceof AbstractRule ar && ar.isEnabled())
+                .filter(rule -> rule.matches(packet))
+                .findFirst();
     }
 
     /**
      * Gets the first rule that matches the given packet.
+     * Kept for backward compatibility.
      *
      * @param packet the packet to check
      * @return the matching rule, or null if no rule matches
      */
     public FilterRule getMatchingRule(Packet packet) {
-        for (FilterRule rule : rules) {
-            if (rule.matches(packet)) {
-                return rule;
-            }
-        }
-        return null;
+        return findMatchingRule(packet).orElse(null);
+    }
+
+    /**
+     * Gets all rules matching a packet using Streams.
+     * Demonstrates: Stream API, filter(), collect(), Collectors.toList()
+     *
+     * @param packet the packet to check
+     * @return list of all matching rules
+     */
+    public List<FilterRule> getAllMatchingRules(Packet packet) {
+        return rules.stream()
+                .filter(rule -> rule.matches(packet))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Counts active rules using Streams.
+     * Demonstrates: Stream API, filter(), count()
+     *
+     * @return number of enabled rules
+     */
+    public long countActiveRules() {
+        return rules.stream()
+                .filter(rule -> rule instanceof AbstractRule ar && ar.isEnabled())
+                .count();
     }
 
     private void sortRulesByPriority() {

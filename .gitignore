@@ -60,8 +60,8 @@ dist/
 build/
 
 # Report and documentation files (keep local only)
-repport_overleaf.md
-Rapport_Firewall_Overleaf.tex
-Compte_Rendu_Firewall.md
-PROJECT_WORKFLOW_GUIDE.md
-FORMULAIRE_REPONSES.md
+*.md
+md/
+.agent/
+repport_overleaf.tex
+*.tex
