@@ -60,8 +60,16 @@ dist/
 build/
 
 # Report and documentation files (keep local only)
-*.md
 md/
 .agent/
-repport_overleaf.tex
 *.tex
+
+# Ignore all markdown except README
+*_GUIDE.md
+*_SCRIPT*.md
+Compte_Rendu*.md
+FORMULAIRE*.md
+VIDEO*.md
+GIT_PUSH*.md
+AI_ASSISTANT*.md
+repport*.md
