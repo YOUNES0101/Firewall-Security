@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.firewall.ui.controller.CaptureController"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="220" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets top="24" right="0" bottom="24" left="0"/>
+            </padding>
+            
+            <!-- App Branding -->
+            <VBox spacing="4" alignment="CENTER">
+                <padding>
+                    <Insets bottom="24" left="20" right="20"/>
+                </padding>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <StackPane>
+                        <Circle radius="20" style="-fx-fill: linear-gradient(to bottom right, #0078d4, #00bcf2);"/>
+                        <Label text="🛡" style="-fx-font-size: 18px;"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Firewall" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;"/>
+                        <Label text="Security" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <Separator/>
+            
+            <!-- Navigation -->
+            <VBox spacing="2">
+                <padding>
+                    <Insets top="16" left="12" right="12"/>
+                </padding>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT" onMouseClicked="#onBack"
+                      style="-fx-background-radius: 6; -fx-padding: 10 12; -fx-cursor: hand;">
+                    <Label text="📡" style="-fx-font-size: 16px;"/>
+                    <Label text="Network Interfaces" style="-fx-font-size: 13px; -fx-text-fill: #1a1a1a;"/>
+                </HBox>
+                
+                <HBox fx:id="captureNavItem" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#showCaptureTab"
+                      style="-fx-background-color: #e5f3ff; -fx-background-radius: 6; -fx-padding: 10 12; -fx-cursor: hand;">
+                    <Label text="📊" style="-fx-font-size: 16px;"/>
+                    <Label text="Live Capture" style="-fx-font-size: 13px; -fx-text-fill: #0078d4; -fx-font-weight: 600;"/>
+                </HBox>
+                
+                <HBox fx:id="historyNavItem" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#showHistoryTab"
+                      style="-fx-background-radius: 6; -fx-padding: 10 12; -fx-cursor: hand;">
+                    <Label text="🗄" style="-fx-font-size: 16px;"/>
+                    <Label text="Packet History" style="-fx-font-size: 13px; -fx-text-fill: #1a1a1a;"/>
+                </HBox>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <!-- Session Info -->
+            <VBox spacing="8">
+                <padding>
+                    <Insets top="16" left="20" right="20"/>
+                </padding>
+                <Separator/>
+                <VBox spacing="4">
+                    <padding>
+                        <Insets top="8"/>
+                    </padding>
+                    <Label text="Current Session" style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                    <Label fx:id="sessionLabel" text="---" style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                </VBox>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Circle fx:id="dbIndicator" radius="5" style="-fx-fill: #ffa500;"/>
+                    <Label fx:id="dbStatusLabel" text="Database..." style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <StackPane fx:id="contentStack">
+            
+            <!-- ==================== CAPTURE VIEW ==================== -->
+            <VBox fx:id="captureView" spacing="0">
+                
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="16"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                    <padding>
+                        <Insets top="20" right="32" bottom="20" left="32"/>
+                    </padding>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label fx:id="interfaceLabel" text="Network Capture" 
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;"/>
+                        <Label text="Configure filter rules and capture network packets" 
+                               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+                    </VBox>
+                    <VBox alignment="CENTER_RIGHT" spacing="2">
+                        <Label fx:id="packetCountLabel" text="0" 
+                               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0078d4;"/>
+                        <Label text="packets captured" style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Content -->
+                <ScrollPane fitToWidth="true" fitToHeight="true" 
+                            style="-fx-background-color: transparent; -fx-background: #f5f5f5;" VBox.vgrow="ALWAYS">
+                    <HBox spacing="24">
+                        <padding>
+                            <Insets top="24" right="32" bottom="24" left="32"/>
+                        </padding>
+                        
+                        <!-- Left Column: Rules & Controls -->
+                        <VBox spacing="16" prefWidth="320">
+                            
+                            <!-- Filter Rules Card -->
+                            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                                <padding>
+                                    <Insets top="16" right="16" bottom="16" left="16"/>
+                                </padding>
+                                
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <StackPane>
+                                        <Circle radius="16" style="-fx-fill: #fde7e9;"/>
+                                        <Label text="🚫" style="-fx-font-size: 12px;"/>
+                                    </StackPane>
+                                    <Label text="Filter Rules" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                </HBox>
+                                
+                                <Separator/>
+                                
+                                <!-- IP Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block IP Address" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <TextField fx:id="ipBlockField" promptText="192.168.1.100" HBox.hgrow="ALWAYS"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddIpRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- IP Range Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block IP Range (CIDR)" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <TextField fx:id="ipRangeField" promptText="192.168.1.0/24" HBox.hgrow="ALWAYS"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddIpRangeRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- Port Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block Port" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <TextField fx:id="portBlockField" promptText="80" HBox.hgrow="ALWAYS"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddPortRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- Port Range Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block Port Range" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <TextField fx:id="portStartField" promptText="1" prefWidth="60"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Label text="to" style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                                        <TextField fx:id="portEndField" promptText="1024" prefWidth="60"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddPortRangeRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- Protocol Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block Protocol" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <ComboBox fx:id="protocolCombo" HBox.hgrow="ALWAYS"
+                                                  style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddProtocolRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- Large Packet Block -->
+                                <VBox spacing="4">
+                                    <Label text="Block Large Packets (bytes)" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #666666;"/>
+                                    <HBox spacing="6">
+                                        <TextField fx:id="payloadSizeField" promptText="1500" HBox.hgrow="ALWAYS"
+                                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                        <Button text="Add" onAction="#onAddPayloadRule"
+                                                style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 6 12; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+                                
+                                <Separator/>
+                                
+                                <!-- Active Rules -->
+                                <VBox spacing="6">
+                                    <HBox alignment="CENTER_LEFT">
+                                        <Label text="Active Rules" style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="ruleCountLabel" text="0" style="-fx-font-size: 12px; -fx-text-fill: #0078d4; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <ListView fx:id="rulesListView" prefHeight="80"
+                                              style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4;"/>
+                                    <Button text="Clear All Rules" onAction="#onClearRules" maxWidth="Infinity"
+                                            style="-fx-background-color: transparent; -fx-text-fill: #d13438; -fx-font-size: 11px; -fx-padding: 6; -fx-border-color: #d13438; -fx-border-radius: 4; -fx-cursor: hand;"/>
+                                </VBox>
+                            </VBox>
+                            
+                            <!-- Capture Controls Card -->
+                            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                                <padding>
+                                    <Insets top="16" right="16" bottom="16" left="16"/>
+                                </padding>
+                                
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <StackPane>
+                                        <Circle radius="16" style="-fx-fill: #dff6dd;"/>
+                                        <Label text="▶" style="-fx-font-size: 12px;"/>
+                                    </StackPane>
+                                    <Label text="Capture Control" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                </HBox>
+                                
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Label text="Max packets:" style="-fx-font-size: 12px; -fx-text-fill: #1a1a1a;"/>
+                                    <TextField fx:id="maxPacketsField" text="100" prefWidth="60"
+                                               style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 6 10; -fx-font-size: 12px;"/>
+                                </HBox>
+                                
+                                <HBox spacing="8">
+                                    <Button fx:id="startButton" text="▶ Start" onAction="#onStartCapture" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                            style="-fx-background-color: #107c10; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 10; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                    <Button fx:id="stopButton" text="⬛ Stop" onAction="#onStopCapture" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"
+                                            style="-fx-background-color: #d13438; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 10; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                                </HBox>
+                                
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <ProgressIndicator fx:id="captureProgress" visible="false" prefWidth="14" prefHeight="14"/>
+                                    <Label fx:id="captureStatusLabel" text="Ready" style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                        
+                        <!-- Right Column: Packet Table -->
+                        <VBox spacing="12" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                            <padding>
+                                <Insets top="16" right="16" bottom="16" left="16"/>
+                            </padding>
+                            
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <StackPane>
+                                    <Circle radius="16" style="-fx-fill: #e5f3ff;"/>
+                                    <Label text="📋" style="-fx-font-size: 12px;"/>
+                                </StackPane>
+                                <Label text="Captured Packets" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                            </HBox>
+                            
+                            <TableView fx:id="packetsTable" VBox.vgrow="ALWAYS"
+                                       style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4;">
+                                <columns>
+                                    <TableColumn fx:id="timeColumn" text="Time" prefWidth="65"/>
+                                    <TableColumn fx:id="srcIpColumn" text="Source IP" prefWidth="105"/>
+                                    <TableColumn fx:id="srcPortColumn" text="Port" prefWidth="50"/>
+                                    <TableColumn fx:id="dstIpColumn" text="Dest IP" prefWidth="105"/>
+                                    <TableColumn fx:id="dstPortColumn" text="Port" prefWidth="50"/>
+                                    <TableColumn fx:id="protocolColumn" text="Protocol" prefWidth="55"/>
+                                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="70"/>
+                                </columns>
+                            </TableView>
+                            
+                            <HBox spacing="10" alignment="CENTER_RIGHT">
+                                <Button text="Export CSV" onAction="#onExportCsv"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #0078d4; -fx-font-size: 11px; -fx-padding: 6 14; -fx-border-color: #0078d4; -fx-border-radius: 4; -fx-cursor: hand;"/>
+                                <Button text="Clear" onAction="#onClearTable"
+                                        style="-fx-background-color: transparent; -fx-text-fill: #666666; -fx-font-size: 11px; -fx-padding: 6 14; -fx-border-color: #d0d0d0; -fx-border-radius: 4; -fx-cursor: hand;"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </ScrollPane>
+            </VBox>
+            
+            <!-- ==================== HISTORY VIEW ==================== -->
+            <VBox fx:id="historyView" spacing="0" visible="false">
+                
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" spacing="16"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                    <padding>
+                        <Insets top="20" right="32" bottom="20" left="32"/>
+                    </padding>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Packet History" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;"/>
+                        <Label text="View previously captured packets from database" 
+                               style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+                    </VBox>
+                    <Button text="Refresh" onAction="#onRefreshHistory"
+                            style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 20; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                </HBox>
+                
+                <!-- Content -->
+                <VBox spacing="16" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets top="24" right="32" bottom="24" left="32"/>
+                    </padding>
+                    
+                    <VBox spacing="12" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+                        
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <StackPane>
+                                <Circle radius="16" style="-fx-fill: #e5f3ff;"/>
+                                <Label text="🗄" style="-fx-font-size: 12px;"/>
+                            </StackPane>
+                            <Label text="Database Records" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="historyCountLabel" text="0 records" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        </HBox>
+                        
+                        <TableView fx:id="historyTable" VBox.vgrow="ALWAYS"
+                                   style="-fx-background-color: #fafafa; -fx-border-color: #e0e0e0; -fx-border-radius: 4; -fx-background-radius: 4;">
+                            <columns>
+                                <TableColumn fx:id="hIdColumn" text="ID" prefWidth="45"/>
+                                <TableColumn fx:id="hTimeColumn" text="Captured At" prefWidth="130"/>
+                                <TableColumn fx:id="hSrcIpColumn" text="Source IP" prefWidth="100"/>
+                                <TableColumn fx:id="hSrcPortColumn" text="Port" prefWidth="45"/>
+                                <TableColumn fx:id="hDstIpColumn" text="Dest IP" prefWidth="100"/>
+                                <TableColumn fx:id="hDstPortColumn" text="Port" prefWidth="45"/>
+                                <TableColumn fx:id="hProtocolColumn" text="Protocol" prefWidth="55"/>
+                                <TableColumn fx:id="hRuleColumn" text="Matched Rule" prefWidth="120"/>
+                                <TableColumn fx:id="hSessionColumn" text="Session" prefWidth="65"/>
+                            </columns>
+                        </TableView>
+                        
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Showing last 200 records" style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Delete All" onAction="#onDeleteAllHistory"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #d13438; -fx-font-size: 11px; -fx-padding: 6 14; -fx-border-color: #d13438; -fx-border-radius: 4; -fx-cursor: hand;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+            
+        </StackPane>
+    </center>
+
+</BorderPane>

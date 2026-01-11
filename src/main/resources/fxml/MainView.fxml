@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.firewall.ui.controller.InterfaceController"
+            stylesheets="@../css/style.css"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="220" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets top="24" right="0" bottom="24" left="0"/>
+            </padding>
+            
+            <!-- App Branding -->
+            <VBox spacing="4" alignment="CENTER">
+                <padding>
+                    <Insets bottom="24" left="20" right="20"/>
+                </padding>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <StackPane>
+                        <Circle radius="20" style="-fx-fill: linear-gradient(to bottom right, #0078d4, #00bcf2);"/>
+                        <Label text="🛡" style="-fx-font-size: 18px;"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Firewall" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;"/>
+                        <Label text="Security" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <Separator/>
+            
+            <!-- Navigation Menu -->
+            <VBox spacing="2">
+                <padding>
+                    <Insets top="16" left="12" right="12"/>
+                </padding>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT" 
+                      style="-fx-background-color: #e5f3ff; -fx-background-radius: 6; -fx-padding: 10 12;">
+                    <Label text="📡" style="-fx-font-size: 16px;"/>
+                    <Label text="Network Interfaces" style="-fx-font-size: 13px; -fx-text-fill: #0078d4; -fx-font-weight: 600;"/>
+                </HBox>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT" 
+                      style="-fx-background-radius: 6; -fx-padding: 10 12; -fx-cursor: hand;" opacity="0.6">
+                    <Label text="📊" style="-fx-font-size: 16px;"/>
+                    <Label text="Capture History" style="-fx-font-size: 13px; -fx-text-fill: #1a1a1a;"/>
+                </HBox>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT" 
+                      style="-fx-background-radius: 6; -fx-padding: 10 12; -fx-cursor: hand;" opacity="0.6">
+                    <Label text="⚙" style="-fx-font-size: 16px;"/>
+                    <Label text="Settings" style="-fx-font-size: 13px; -fx-text-fill: #1a1a1a;"/>
+                </HBox>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <!-- Bottom Status -->
+            <VBox spacing="8">
+                <padding>
+                    <Insets top="16" left="20" right="20"/>
+                </padding>
+                <Separator/>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets top="8"/>
+                    </padding>
+                    <Circle fx:id="dbIndicator" radius="5" style="-fx-fill: #ffa500;"/>
+                    <Label fx:id="dbStatusLabel" text="Connecting..." 
+                           style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <VBox spacing="0">
+            
+            <!-- Page Header -->
+            <HBox alignment="CENTER_LEFT" spacing="16"
+                  style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                <padding>
+                    <Insets top="20" right="32" bottom="20" left="32"/>
+                </padding>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Network Interfaces" 
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;"/>
+                    <Label text="Select a network adapter to monitor and capture traffic" 
+                           style="-fx-font-size: 13px; -fx-text-fill: #666666;"/>
+                </VBox>
+            </HBox>
+            
+            <!-- Content Body -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #f5f5f5;" 
+                        VBox.vgrow="ALWAYS">
+                <VBox spacing="24">
+                    <padding>
+                        <Insets top="24" right="32" bottom="24" left="32"/>
+                    </padding>
+                    
+                    <!-- Scan Section Card -->
+                    <VBox spacing="16" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                        <padding>
+                            <Insets top="20" right="24" bottom="20" left="24"/>
+                        </padding>
+                        
+                        <HBox spacing="16" alignment="CENTER_LEFT">
+                            <StackPane>
+                                <Circle radius="24" style="-fx-fill: #e5f3ff;"/>
+                                <Label text="🔍" style="-fx-font-size: 20px;"/>
+                            </StackPane>
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Scan for Network Adapters" 
+                                       style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                <Label text="Detect all available network interfaces on this computer" 
+                                       style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                            </VBox>
+                            <Button fx:id="scanButton" text="Scan" onAction="#onScanInterfaces"
+                                    style="-fx-background-color: #0078d4; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-padding: 8 24; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                            <ProgressIndicator fx:id="progressIndicator" visible="false" prefWidth="24" prefHeight="24"/>
+                        </HBox>
+                        
+                        <Label fx:id="statusLabel" text="" style="-fx-font-size: 12px; -fx-text-fill: #0078d4;"/>
+                    </VBox>
+                    
+                    <!-- Interface List Card -->
+                    <VBox spacing="16" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                        <padding>
+                            <Insets top="20" right="24" bottom="20" left="24"/>
+                        </padding>
+                        
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Label text="Available Interfaces" 
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="countLabel" text="0 found" 
+                                   style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+                        </HBox>
+                        
+                        <ListView fx:id="interfaceListView" prefHeight="220"
+                                  style="-fx-background-color: #fafafa; -fx-background-radius: 6; -fx-border-color: #e0e0e0; -fx-border-radius: 6;"/>
+                        
+                        <HBox spacing="12" alignment="CENTER_RIGHT">
+                            <Button fx:id="selectButton" text="Select Interface" onAction="#onSelectInterface"
+                                    disable="true"
+                                    style="-fx-background-color: #107c10; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-padding: 10 24; -fx-background-radius: 4; -fx-cursor: hand;"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Info Cards Row -->
+                    <HBox spacing="16">
+                        <!-- Capture Info -->
+                        <VBox spacing="8" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                            <padding>
+                                <Insets top="16" right="20" bottom="16" left="20"/>
+                            </padding>
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <StackPane>
+                                    <Circle radius="18" style="-fx-fill: #fff4ce;"/>
+                                    <Label text="📦" style="-fx-font-size: 14px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Capture Limit" 
+                                           style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                    <Label text="100 packets per session" 
+                                           style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        
+                        <!-- Storage Info -->
+                        <VBox spacing="8" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                            <padding>
+                                <Insets top="16" right="20" bottom="16" left="20"/>
+                            </padding>
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <StackPane>
+                                    <Circle radius="18" style="-fx-fill: #dff6dd;"/>
+                                    <Label text="💾" style="-fx-font-size: 14px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Storage" 
+                                           style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                    <Label text="MySQL Database (Docker)" 
+                                           style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        
+                        <!-- Filter Info -->
+                        <VBox spacing="8" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                            <padding>
+                                <Insets top="16" right="20" bottom="16" left="20"/>
+                            </padding>
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <StackPane>
+                                    <Circle radius="18" style="-fx-fill: #e5f3ff;"/>
+                                    <Label text="🔒" style="-fx-font-size: 14px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Firewall Rules" 
+                                           style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1a1a1a;"/>
+                                    <Label text="IP &amp; Port blocking" 
+                                           style="-fx-font-size: 11px; -fx-text-fill: #666666;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Requirements Notice -->
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: #fff4ce; -fx-background-radius: 6; -fx-padding: 12 16;">
+                        <Label text="⚠" style="-fx-font-size: 16px;"/>
+                        <Label text="Administrator privileges required for packet capture. Make sure Npcap is installed." 
+                               style="-fx-font-size: 12px; -fx-text-fill: #5c5c00;"/>
+                    </HBox>
+                    
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+</BorderPane>
