@@ -1,6 +1,8 @@
 # Firewall Security
 
-A real-time network packet capture and filtering application developed in Java.
+![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white) ![JavaFX](https://img.shields.io/badge/JavaFX-21-blue) ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white)
+
+A real-time network packet capture and filtering application developed in Java: capture live traffic on a chosen interface, evaluate every packet against configurable rules, and keep an auditable history of what was allowed or blocked.
 
 ## Description
 
@@ -120,8 +122,8 @@ The application uses MySQL running in Docker:
 | Host | localhost |
 | Port | 3306 |
 | Database | firewall_db |
-| User | firewall |
-| Password | firewall123 |
+
+Credentials are defined in `docker-compose.yml` and `META-INF/persistence.xml`. They are local development values only; change them before any shared or production use.
 
 ## Architecture
 
@@ -145,6 +147,6 @@ The application follows a layered architecture:
 
 Email: youneschemmaoui1@gmail.com
 
-## License
+## Context
 
-This project was developed as part of the Advanced Java course at EMSI.
+Developed as part of the Advanced Java course at EMSI (École Marocaine des Sciences de l'Ingénieur).
